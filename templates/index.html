@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crypto Chatbot</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .chat-container {
+            width: 400px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            text-align: center;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        #chatbox {
+            height: 300px;
+            border: 1px solid #ccc;
+            padding: 10px;
+            overflow-y: scroll;
+            margin-bottom: 20px;
+            background-color: #f9f9f9;
+        }
+
+        .message {
+            padding: 10px;
+            margin: 5px 0;
+            border-radius: 5px;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+
+        .user-message {
+            background-color: #e0f7fa;
+            align-self: flex-end;
+            margin-left: auto;
+        }
+
+        .bot-message {
+            background-color: #f1f8e9;
+            align-self: flex-start;
+            margin-right: auto;
+        }
+
+        form {
+            display: flex;
+            justify-content: space-between;
+        }
+
+        input[type="text"] {
+            width: 80%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        button {
+            padding: 10px;
+            background-color: #4caf50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+    <div class="chat-container">
+        <h1>Crypto Chatbot</h1>
+        <div id="chatbox">
+            <div id="messages"></div>
+        </div>
+        <form id="chat-form">
+            <input type="text" id="message" placeholder="Ask me about crypto prices..." autocomplete="off" required>
+            <button type="submit">Send</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("chat-form").addEventListener("submit", async function(event) {
+            event.preventDefault();
+
+            // Get the user input
+            const message = document.getElementById("message").value;
+            if (message === "") return;
+
+            // Add user message to chat
+            const messagesDiv = document.getElementById("messages");
+            const userMessage = `<div class="message user-message">${message}</div>`;
+            messagesDiv.innerHTML += userMessage;
+
+            // Clear the input field
+            document.getElementById("message").value = "";
+
+            // Send the user message to the chatbot backend
+            const response = await fetch("/chatbot", {
+                method: "POST",
+                body: new URLSearchParams({ message: message }),
+                headers: {
+                    "Content-Type": "application/x-www-form-urlencoded"
+                }
+            });
+
+            const result = await response.json();
+            const botMessage = `<div class="message bot-message">${result.response}</div>`;
+            messagesDiv.innerHTML += botMessage;
+
+            // Scroll to the bottom of the chatbox
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+        });
+    </script>
+</body>
+</html>
